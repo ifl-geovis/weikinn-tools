@@ -6,7 +6,7 @@ $GLOBAL_PUBLISH 	= 't';
 $GLOBAL_SOURCE_ID	= 3000;
 $GLOBAL_TIMESTAMP	= date('Y-m-d H:i:s').'.0+1';
 
-$ordner			=	'/Temp/weikinn';
+$ordner			=	'./temp/weikinn';
 $ordner_ausgabe	= 	$ordner.'/';
 
 $nameID = 12000;

@@ -3,8 +3,8 @@ require_once( './vendors/php-excel-reader-2.21/excel_reader2.php');
 
 $store = true;
 
-$datafolder = '/Temp/weikinn/jahreOhneGeo/';
-$resultfolder = '/Temp/weikinn/';
+$datafolder = './temp/weikinn/jahre/';
+$resultfolder = './temp/weikinn/';
 
 $files = glob($datafolder."*.xls");
 /*
@@ -33,6 +33,7 @@ $data2 = array();
 $data3 = array();
 
 $recordCount = array();
+$filecounter = "";
 
 foreach ($files as $importfilename) {
 	$filecounter++;

@@ -48,7 +48,7 @@ FORMAT DER TABELLEN
 
 require_once( './vendors/php-excel-reader-2.21/excel_reader2.php');
 
-$ordner			=	'/Temp/weikinn';
+$ordner			=	'./temp/weikinn';
 
 $ortstabelle 	= 	$ordner."/120425_Ortsdatei.xls";
 
@@ -920,8 +920,8 @@ class Zettel  {
 		$datumA[2] = mytrim($xls->val( $row, 9));
 		// ^\s*\[
 		// \]\s=\>\s\d*
-		$tagRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab)?\s?(\[?([1-3]?\d)?(I|II|III)?\.\s?(Dekade|Pentade|H.lfte)?)?(\s?\[?(Anfang|Mitte|Ende)?\]?)?\Z';
-		$monatRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab)?\s?(Januar|Februar|M.rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)?(Jan\.|Feb\.|Febr\.|Apr\.|Okt\.|Nov.)?(Fr.hling|Fr.hjahr|Sommer|Herbst|Winter)?(\d\.\s\H.lfte)?(Anfang|Mitte|Ende)?\]?\Z';
+		$tagRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab|Anf\.)?\s?(\[?([1-3]?\d)?(I|II|III)?\.\s?(Dekade|Pentade|H.lfte)?)?(\s?\[?(Anfang|Mitte|Ende)?\]?)?\Z';
+		$monatRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab)?\s?(Januar|Februar|M.rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)?(Jan\.|Feb\.|Febr\.|Apr\.|Aug\.|Sep\.|Sept\.|Okt\.|Nov\.|Dez\.)?(Fr.hling|Fr.hjahr|Sommer|Herbst|Winter)?(\d\.\s\H.lfte)?(Anfang|Mitte|Ende)?\]?\Z';
 		$jahrRP = '\A\[?\d{4}\]?\Z'; // Bei Winter ist eckige Klammer nicht unsicher, sondern Vorjahr
 		
 		//preg_match braucht hinten und vorne am Pattern ein #
@@ -992,6 +992,7 @@ class Zettel  {
 			
 			$datumA[1] = mytrim( $datumA[1] );
 			
+			// hier entsteht der Fehler für November
 			if (!empty($datumA[1])) {
 				$this->datumA_code[1] =SQL_Null;
 				$this->datumA_certain[1] =SQL_False;
@@ -1187,11 +1188,11 @@ class Zettel  {
 		15;"Sommer                                            "
 		16;"Herbst                                            "
 	*/
-		$month = str_ireplace('januar', '', $month, $count);
+		$month = str_ireplace(array('januar','jan.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 1;
 		}
-		$month = str_ireplace('februar', '', $month, $count);
+		$month = str_ireplace(array('februar','feb.','febr.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 2;
 		}
@@ -1199,7 +1200,7 @@ class Zettel  {
 		if ($count>0) {
 			$month_code = 3;
 		}
-		$month = str_ireplace('april', '', $month, $count);
+		$month = str_ireplace(array('april','apr.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 4;
 		}
@@ -1215,11 +1216,11 @@ class Zettel  {
 		if ($count>0) {
 			$month_code = 7;
 		}
-		$month = str_ireplace('august', '', $month, $count);
+		$month = str_ireplace(array('august','aug.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 8;
 		}
-		$month = str_ireplace('september', '', $month, $count);
+		$month = str_ireplace(array('september','sept.','sep.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 9;
 		}
@@ -1227,11 +1228,11 @@ class Zettel  {
 		if ($count>0) {
 			$month_code = 10;
 		}
-		$month = str_ireplace('november', '', $month, $count);
+		$month = str_ireplace(array('november','nov.'),'', $month, $count);
 		if ($count>0) {
 			$month_code = 11;
 		}
-		$month = str_ireplace('dezember', '', $month, $count);
+		$month = str_ireplace(array('dezember','dez.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 12;
 		}
@@ -1251,9 +1252,8 @@ class Zettel  {
 		$month = str_ireplace('herbst', '', $month, $count);
 		if ($count>0) {
 			$month_code = 16;
-		}
-		
-		$month = str_ireplace('anfang', '', $month, $count);
+		}		
+		$month = str_ireplace(array('anfang','anf.'), '', $month, $count);
 		if ($count>0) {
 			$month_code = 17;
 		}
@@ -1292,7 +1292,7 @@ class Zettel  {
 			$ok = false;
 		}
 		
-		$day = str_ireplace('anfang', '', $day, $count);
+		$day = str_ireplace(array('anfang','anf.'), '', $day, $count);
 		if ($count>0) {
 			$day_code = 41;
 		}
