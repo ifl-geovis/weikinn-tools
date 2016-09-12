@@ -1809,6 +1809,7 @@ class Bilder {
 			$f = file_get_contents( $bilderfilename );
 		}
 		
+		//$lines = explode( PHP_EOL, $f );
 		$lines = explode( "\n", $f );
 		
 		unset( $f );

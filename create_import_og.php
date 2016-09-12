@@ -1,4 +1,6 @@
-<?
+<?php
+error_reporting(E_ALL);
+require_once( 'weikinn.php' );
 
 $GLOBAL_PROJECT_ID 	= 38;
 $GLOBAL_CREATED_BY 	= 1;
@@ -7,7 +9,7 @@ $GLOBAL_SOURCE_ID	= 3000;
 $GLOBAL_TIMESTAMP	= date('Y-m-d H:i:s').'.0+1';
 
 $ordner			=	'./temp/weikinn';
-$ordner_ausgabe	= 	$ordner.'/';
+$ordner_ausgabe	= 	$ordner.'/sql/';
 
 $nameID = 12000;
 $locationID = 9000;
@@ -51,7 +53,6 @@ $eventCodes = array(
 	);
  
 
-require_once( 'weikinn.php' );
 
 echo "Erzeugung der Import-Dateien ============================\n\n";
 
