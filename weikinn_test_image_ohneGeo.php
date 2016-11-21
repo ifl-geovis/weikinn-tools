@@ -100,7 +100,7 @@ $start = microtime(true);
 $jahreszahl = 1789;
 
 $jahreszahlen = $weikinn->jahreszahlen() ;
-//$jahreszahlen = array(1748,1750,1784,1827,1838,1865,1884);
+//$jahreszahlen = array(1800,1802,1803,1804,1805,1806,1807,1808,1809,1810,1811,1812,1813,1814,1815,1816,1817,1818,1819,1820,1821,1822,1823,1824,1825,1826);
 
 
 $bilder = new Bilder();
