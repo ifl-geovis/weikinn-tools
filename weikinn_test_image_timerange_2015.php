@@ -6,7 +6,7 @@ $fehler = array();
 $jahre = array();
 
 
-$f = file_get_contents( "./temp/weikinn/_dateinamen.txt" );
+$f = file_get_contents( "./temp/weikinn/dateinamen.txt" );
 
 $lines = explode( "\n", $f );
 $linenum = 0;
