@@ -9,8 +9,10 @@ copyrighted under MIT license by Leibniz Institute for Regional Geography, Leipz
 2. Run with `php weikinn_test_ohneGeo.php > log.txt`
 
 ## Usage go scripts:
+
 1. Create .csv from pgsql `Select substring(comment FROM 'IMAGEFILES;;.*')
 FROM grouping.quote
 WHERE project_id = 38 OR project_id = 13` rename file to weikinn_abfrage.csv
 2. Move dateinamen.txt and weikinn_abfrage.csv to `temp/weikinn`
-3. Run `./extract-image.tmb > log.txt`
+3. To validate tambora images against harddisk images run `./validate-tmb-img-on-hd > log.txt`
+4. To validate harddisk images against tambora images run `./validate-hd-image-in-tmb > log.txt`
