@@ -3,9 +3,9 @@ error_reporting(E_ALL);
 require_once( 'weikinn.php' );
 
 $GLOBAL_PROJECT_ID 	= 38;
+$GLOBAL_SOURCE_ID	= 3000;
 $GLOBAL_CREATED_BY 	= 1;
 $GLOBAL_PUBLISH 	= 't';
-$GLOBAL_SOURCE_ID	= 3000;
 $GLOBAL_TIMESTAMP	= date('Y-m-d H:i:s').'.0+1';
 
 $ordner			=	'./temp/weikinn';
@@ -17,10 +17,10 @@ $locationID = 9000;
 $weikinnSetupFile = "-- Weikinn Setup File\n";
 $weikinnCleanupFile = "-- Weikinn Cleanup File\n\n-- Removes all data from THIS import session\n\n";
 
-$quotesFile = 'COPY quote (id, source_id, project_id, doi_id, created_by, modified_by, text, page, file, text_vector, publish, comment, "timestamp") FROM stdin;'."\n";
-$quoteTemplate = "%id	$GLOBAL_SOURCE_ID	$GLOBAL_PROJECT_ID	\\N	$GLOBAL_CREATED_BY	\\N	%text	%page	%file	\\N	t	%comment	$GLOBAL_TIMESTAMP\n";
+$quotesFile = 'COPY grouping.quote (id, source_id, project_id, created_by, modified_by, text, page, file, text_vector, public, comment) FROM stdin;'."\n";
+$quoteTemplate = "%id	$GLOBAL_SOURCE_ID	$GLOBAL_PROJECT_ID	$GLOBAL_CREATED_BY	\\N	%text	%page	%file	\\N	true	%comment\n";
 $quoteVars = array('%id','%text','%page','%file','%comment');
-$quoteID = 72000;
+$quoteID = 140000;
 
 $eventsFile = 'COPY event (id, quote_id, project_id, doi_id, code_id, name_id, created_by, modified_by, measurement, time_begin, time_end, publish, time_description, hour_id_begin, hour_id_end, day_id_begin, day_id_end, month_id_begin, month_id_end, year_begin, year_end, comment, year_begin_certain, year_end_certain, month_begin_certain, month_end_certain, day_begin_certain, day_end_certain, hour_begin_certain, hour_end_certain, "timestamp") FROM stdin;'."\n";
 $eventTemplate = "%id	%quote_id	$GLOBAL_PROJECT_ID	\\N	%code_id	%name_id	$GLOBAL_CREATED_BY	\\N	\\N	\\N	\\N	t	%time_description	%hour_id_begin	%hour_id_end	%day_id_begin	%day_id_end	%month_id_begin	%month_id_end	%year_id_begin	%year_id_end	%comment	%year_begin_certain	%year_end_certain	%month_begin_certain	%month_end_certain	%day_begin_certain	%day_end_certain	%hour_begin_certain	%hour_end_certain	$GLOBAL_TIMESTAMP\n";
@@ -83,50 +83,6 @@ echo "Erzeuge Event-Codes...\n\n";
 
 $weikinnSetupFile .= "\n\n-- Event Codes\n--uebersprungen\n\n";
 
-/*
-
-echo "Hole Names und Locations aus DB... uebersprungen.\n\n";
-echo "Erzeuge Names und Locations aus Ortstabelle...\n\n";
-
-
-$weikinnSetupFile .= "\n\n-- Names and Locations\n\n";
-
-$orte = new Ortstabelle();
-
-$NameIDs = array();
-
-echo "Fehler in der Ortstabelle:\n";
-echo print_r( $orte->errors,true );
-
-
-
-foreach ($orte->locations as $ortsname=>$ort) {
-	$name = str_replace("'","''",$ortsname);
-	if (!empty($name)) {
-		$NameIDs[$ortsname] = $nameID;
-		$weikinnSetupFile .= "INSERT INTO name( id, location_id, name, created_by, project_id, \"timestamp\" ) "
-						."VALUES ($nameID, $locationID, '$name', $GLOBAL_CREATED_BY, $GLOBAL_PROJECT_ID, '$GLOBAL_TIMESTAMP');\n";
-						
-		$weikinnSetupFile .= "INSERT INTO name_tag( name_id, tag_id ) VALUES ($nameID, $ORT2_TAG_ID);\n";
-		
-		
-		if (empty($ort['wkt'])) {
-			//$weikinnSetupFile .= "INSERT INTO location( id, primary_name_id, location_type_id) VALUES ($locationID, $nameID);\n";
-			$geo_col = "";
-			$geo_val = "";
-		} else {
-			$geo_col = ", geometry";
-			$geo_val = ", ST_GeomFromEWKT('{$ort['wkt']}')";
-		}
-		$weikinnSetupFile .= "INSERT INTO location( id, primary_name_id, location_type_id, created_by, project_id, \"timestamp\" $geo_col) "
-					."VALUES ($locationID, $nameID, {$ort['type']}, $GLOBAL_CREATED_BY, $GLOBAL_PROJECT_ID, '$GLOBAL_TIMESTAMP' $geo_val);\n";
-		
-		$nameID++;
-		$locationID++;
-	}
-}
-
-*/
 
 echo "Starte Erzeugung der Import-Dateien...\n\n";
 
@@ -137,9 +93,7 @@ $bilder = new Bilder();
 $protokoll = array();
 
 $jahreszahlen = $weikinn->jahreszahlen() ;
-//$jahreszahlen = array(1789,1790,1791,1890,1891,1794);
 
-//$jahreszahlen = array(1906);
 
 foreach($jahreszahlen as $jahreszahl) {
 	if (!$weikinn->istGeokodiert($jahreszahl)) {
