@@ -7,12 +7,94 @@ $GLOBAL_SOURCE_ID	= 3000;
 $GLOBAL_CREATED_BY 	= 1;
 $GLOBAL_PUBLISH 	= 't';
 $GLOBAL_TIMESTAMP	= date('Y-m-d H:i:s').'.0+1';
+$GLOBAL_CALENDAR_ID = 1;
 
 $ordner			=	'./temp/weikinn';
 $ordner_ausgabe	= 	$ordner.'/sql/';
 
 $nameID = 12000;
 $locationID = 9000;
+
+function MakeTimeBegin($year, $month, $day) {
+	$year = intval($year);
+	$month = intval($month);
+	$day = intval($day);
+
+	echo "\n";
+	echo $year;
+	echo "\n";
+	echo $month;
+	echo "\n";
+	echo $day;
+	echo "\n";
+
+	if ($year <= 0) {
+		$year = 9999;
+	};
+
+	if ($month <= 0 || $month > 12) {
+		$month = 12;
+	};
+
+	switch ($day) {
+		case 32:
+			$day = 01;
+			break;
+		case 33:
+			$day = 06;
+			break;
+		case 34:
+			$day = 11;
+			break;
+		case 35:
+			$day = 16;
+			break;
+		case 36:
+			$day = 21;
+			break;
+		case 37:
+			$day = 26;
+			break;
+		case 38:
+			$day = 01;
+			break;
+		case 39:
+			$day = 11;
+			break;
+		case 40:
+			$day = 21;
+			break;
+		case 41:
+			$day = 01;
+			break;
+		case 42:
+			$day = 11;
+			break;
+		case 43:
+			$day = 21;
+			break;
+		case 44:
+			$day = 01;
+			break;
+		case 45:
+			$day = 16;
+			break;
+		case NULL:
+			$day = 31;
+			break;		
+		default:
+			$day = 31;
+			break;
+	}
+	if ($day <= 0) {
+		$day = 31;
+	};
+
+	$date = new DateTime($year.'-'.$month.'-'.$day);
+	$result = $date->format('Y-m-d H:i:s');
+	return $result;
+
+}
 
 $weikinnSetupFile = "-- Weikinn Setup File\n";
 $weikinnCleanupFile = "-- Weikinn Cleanup File\n\n-- Removes all data from THIS import session\n\n";
@@ -51,6 +133,17 @@ $eventCodes = array(
 	'X'=>array(116,'Hagel'),
 	'Y'=>array(319,'Sonstiges')
 	);
+
+$momentsFile = 'COPY timing.moment (id, type, "time", calendar_id, hour_id, day_id, month_id, year, hour_certain, day_certain, month_certain, year_certain, created_by, modified_by) FROM stdin;'."\n";
+$momentTemplate = "%id	%type	%timestamp	$GLOBAL_CALENDAR_ID	\\N	%day_id	%month_id	%year	\\N	\\N	\\N \\N $GLOBAL_CREATED_BY	\\N\n";
+$momentVars = array('%id', '%type', '%timestamp', '%day_id', '%month_id', '%year');
+$momentID = 650000;
+
+
+$periodsFile = 'COPY timing.period (id, description, begin_moment_id, end_moment_id,  created_by, modified_by) FROM stdin;'."\n";
+$periodTemplate = "%id	\\N	%begin_moment_id	%end_moment_id	$GLOBAL_CREATED_BY	\\N\n";
+$periodVars = array('%id', '%begin_moment_id', '%end_moment_id');
+$periodID = 316000;
  
 
 
@@ -256,6 +349,63 @@ foreach($jahreszahlen as $jahreszahl) {
 				
 				$eventZeile = str_replace( $eventVars, $replace, $eventTemplate );
 				$eventsFile .= $eventZeile;
+
+			// tambora timing 
+				foreach ($zitat->events as $event) {
+				
+				// timing.period
+				$periodVars = array('%id', '%begin_moment_id', '%end_moment_id');
+				$replace = array(
+					$periodID, 		// %id
+					$momentID, 	 	// %begin_moment_id
+					$momentID+1,	// %end_moment_id					
+					);
+				
+				$periodZeile = str_replace( $periodVars, $replace, $periodTemplate );
+				$periodsFile .= $periodZeile;
+
+				$periodID++;
+
+			// timing.moment 
+				
+				// %year_id_begin)
+				if (!empty($zitat->datumA_code[2])) {
+
+					$replace = array(
+						$momentID, 				// %id
+						'begin', 				// %type
+						MakeTimeBegin($zitat->datumA_code[2], $zitat->datumA_code[1], $zitat->datumA_code[0]),	// %timestamp'
+						$zitat->datumA_code[0],	// %day_id
+						$zitat->datumA_code[1],	// %month_id
+						$zitat->datumA_code[2],	// %year
+						);
+					
+					$momentZeile = str_replace( $momentVars, $replace, $momentTemplate );
+					$momentsFile .= $momentZeile;
+
+					$momentID++;
+				}
+
+				// %year_id_end)
+				if (!empty($zitat->datumB_code[2])) {
+
+					$replace = array(
+						$momentID, 				// %id
+						'end', 					// %type
+						MakeTimeBegin($zitat->datumB_code[2], $zitat->datumB_code[1], $zitat->datumB_code[0]),	// %timestamp'
+						$zitat->datumB_code[0],	// %day_id
+						$zitat->datumB_code[1],	// %month_id
+						$zitat->datumB_code[2],	// %year
+						);
+					
+					$momentZeile = str_replace( $momentVars, $replace, $momentTemplate );
+					$momentsFile .= $momentZeile;
+
+					$momentID++;
+				}
+
+					
+				}
 				
 				
 				$eventID++;
@@ -290,6 +440,14 @@ fclose($f);
 $f = fopen($ordner_ausgabe."og_events__".date('Y-m-d__H-i').".sql",'w');
 //$f = fopen($ordner_ausgabe."events__.sql",'w');
 fwrite( $f, $eventsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."og_periods__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $periodsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."og_timing_moments__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $momentsFile );
 fclose($f);
 
 // Protokoll speichern
