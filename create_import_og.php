@@ -15,344 +15,6 @@ $ordner_ausgabe	= 	$ordner.'/sql/';
 $nameID = 12000;
 $positionID = 314210;
 
-function MakeTimeBegin($year, $month, $day) {
-	$year = intval($year);
-	$month = intval($month);
-	$day = intval($day);
-
-	if ($year == 0) {
-		$year = 9999;
-	};
-
-	if ($month == 0) {
-		$month = 01;
-	} else {
-		switch ($month) {
-			case 13:
-				$month = 12;			
-				break;
-			case 14:
-				$month = 03;
-				break;
-			case 15:
-				$month = 06;
-				break;
-			case 16:
-				$month = 09;
-				break;
-			case 17:
-				$month = 01;
-				break;
-			case 18:
-				$month = 05;
-				break;
-			case 19:
-				$month = 09;
-				break;
-			case 20:
-				$month = 01;
-				break;
-			case 21:
-				$month = 07;
-				break;			
-			default:
-				$month = $month;
-				break;
-		}
-	}
-
-	if ($day == 0) {
-		$day = 01;
-	} else {
-		switch ($day) {
-			case 32:
-				$day = 01;
-				break;
-			case 33:
-				$day = 06;
-				break;
-			case 34:
-				$day = 11;
-				break;
-			case 35:
-				$day = 16;
-				break;
-			case 36:
-				$day = 21;
-				break;
-			case 37:
-				$day = 26;
-				break;
-			case 38:
-				$day = 01;
-				break;
-			case 39:
-				$day = 11;
-				break;
-			case 40:
-				$day = 21;
-				break;
-			case 41:
-				$day = 01;
-				break;
-			case 42:
-				$day = 11;
-				break;
-			case 43:
-				$day = 21;
-				break;
-			case 44:
-				$day = 01;
-				break;
-			case 45:
-				$day = 16;
-				break;		
-			default:
-				$day = $day;
-				break;
-		}
-	}	
-	
-
-	$date = new DateTime($year.'-'.$month.'-'.$day);
-	$result = $date->format('Y-m-d H:i:s');
-	return $result;
-
-}
-
-function MakeTimeEnd($yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd, $dayEnd) {
-	$yearBegin = intval($yearBegin);
-	$yearEnd = intval($yearEnd);
-	$monthBegin = intval($monthBegin);
-	$monthEnd = intval($monthEnd);
-	$dayBegin = intval($dayBegin);
-	$dayEnd = intval($dayEnd);
-
-
-	if ($yearEnd == 0) {
-		$yearEnd = $yearBegin;
-	}
-
-	if ($dayEnd == 0) {
-		if ($dayBegin == 0) {
-			if ($monthBegin == 0) {
-				$monthEnd = 12;
-				$dayEnd = 31;				
-			} else {				
-				$monthEnd = $monthBegin;
-				if ($monthEnd == 02) {
-					$dayEnd = 28;
-				} else {
-					$dayEnd = 31;	
-				}				
-			}
-		} else {
-			switch ($dayBegin) {
-				case 32:
-					$dayEnd = 05;
-					break;
-				case 33:
-					$dayEnd = 10;
-					break;
-				case 34:
-					$dayEnd = 15;
-					break;
-				case 35:
-					$dayEnd = 20;
-					break;
-				case 36:
-					$dayEnd = 25;
-					break;
-				case 37:
-					$dayEnd = 30;
-					break;
-				case 38:
-					$dayEnd = 10;
-					break;
-				case 39:
-					$dayEnd = 20;
-					break;
-				case 40:
-					$dayEnd = 30;
-					break;
-				case 41:
-					$dayEnd = 10;
-					break;
-				case 42:
-					$dayEnd = 20;
-					break;
-				case 43:
-					$dayEnd = 30;
-					break;
-				case 44:
-					$dayEnd = 15;
-					break;
-				case 45:
-					$dayEnd = 30;
-					break;
-				case 28:
-					$monthEnd = $monthBegin+1;
-					$dayBegin = 01;
-				case 31:
-					if ($monthBegin == 12) {
-						$yearEnd = $yearBegin+1;
-						$monthEnd = 01;
-						$dayEnd = 01;	
-					} else {
-						$monthEnd = $monthBegin+1;
-						$dayEnd = 01;	
-					}					
-				default:
-					if ($dayBegin != 31) {
-						$dayEnd = $dayBegin+1;
-						break;	
-					}					
-			}
-		}		
-	} else {
-		switch ($dayEnd) {
-			case 32:
-				$dayEnd = 05;
-				break;
-			case 33:
-				$dayEnd = 10;
-				break;
-			case 34:
-				$dayEnd = 15;
-				break;
-			case 35:
-				$dayEnd = 20;
-				break;
-			case 36:
-				$dayEnd = 25;
-				break;
-			case 37:
-				$dayEnd = 30;
-				break;
-			case 38:
-				$dayEnd = 10;
-				break;
-			case 39:
-				$dayEnd = 20;
-				break;
-			case 40:
-				$dayEnd = 30;
-				break;
-			case 41:
-				$dayEnd = 10;
-				break;
-			case 42:
-				$dayEnd = 20;
-				break;
-			case 43:
-				$dayEnd = 30;
-				break;
-			case 44:
-				$dayEnd = 15;
-				break;
-			case 45:
-				$dayEnd = 30;
-				break;		
-			default:
-				$dayEnd = $dayEnd;
-				break;
-		}
-	}
-
-	if ($monthEnd == 0) {
-		switch ($monthBegin) {
-			case 13:
-				$monthEnd = 02;
-				$yearEnd = $yearEnd+1;
-				$dayEnd = 28;
-				break;
-			case 14:
-				$monthEnd = 05;
-				$dayEnd = 31;
-				break;
-			case 15:				
-				$monthEnd = 08;
-				$dayEnd = 31;
-				$yearEnd = $yearEnd+1;
-				break;
-			case 16:
-				$monthEnd = 11;
-				$dayEnd = 30;
-				break;
-			case 17:
-				$monthEnd = 04;
-				$dayEnd = 30;
-				break;
-			case 18:
-				$monthEnd = 08;
-				$dayEnd = 31;
-				break;
-			case 19:
-				$monthEnd = 12;
-				$dayEnd = 31;
-				break;
-			case 20:
-				$monthEnd = 06;
-				$dayEnd = 30;
-				break;
-			case 21:
-				$monthEnd = 12;
-				$dayEnd = 31;
-				break;			
-			default:
-				$monthEnd = $monthBegin;
-				break;
-		}			
-	} else {
-		switch ($monthEnd) {
-			case 13:
-				$monthEnd = 02;
-				$yearEnd = $yearEnd+1;
-				$dayEnd = 28;
-				break;
-			case 14:
-				$monthEnd = 05;
-				$dayEnd = 31;
-				break;
-			case 15:
-				$monthEnd = 08;
-				$dayEnd = 31;
-				break;
-			case 16:
-				$monthEnd = 11;
-				$dayEnd = 30;
-				break;
-			case 17:
-				$monthEnd = 04;
-				break;
-			case 18:
-				$monthEnd = 08;
-				$dayEnd = 31;
-				break;
-			case 19:
-				$monthEnd = 12;
-				$dayEnd = 31;
-				break;
-			case 20:
-				$monthEnd = 06;
-				$dayEnd = 30;
-				break;
-			case 21:
-				$monthEnd = 12;
-				$dayEnd = 31;
-				break;			
-			default:
-				$monthEnd = $monthEnd;
-				break;
-		}
-	}
-	
-	$date = new DateTime($yearEnd.'-'.$monthEnd.'-'.$dayEnd);
-	$result = $date->format('Y-m-d H:i:s');
-	return $result;
-
-}
-
 function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd, $dayEnd) {
 	$yearBegin = intval($yearBegin);
 	$yearEnd = intval($yearEnd);
@@ -367,51 +29,56 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 
 	if ($yearEnd == 0) {
 		$yearEnd = $yearBegin;
+		if ($monthBegin == 0 && $monthEnd == 0) {
+			$monthEnd = 12;			
+		}
 	}
 
 	if ($monthBegin == 0) {
-		$monthBegin = 01;
+		$monthBegin = 1;
 	} else {
 		if ($monthEnd == 0) {
 			switch ($monthBegin) {
 				case 13:
 					$monthBegin = 12;
-					$monthEnd = 02;
-					$yearEnd = $yearEnd+1;				
+					$monthEnd = 2;
+					$dayEnd = 28;
+					$yearEnd = $yearEnd+1;						
 					break;
 				case 14:
-					$monthBegin = 03;
-					$monthEnd = 05;				
+					$monthBegin = 3;
+					$monthEnd = 5;				
 					break;
-				case 15:				
-					$monthBegin = 06;
-					$monthEnd = 08;				
+				case 15:						
+					$monthBegin = 6;										
+					$monthEnd = 8;															
 					break;
 				case 16:
-					$monthBegin = 09;
+					$monthBegin = 9;
 					$monthEnd = 11;				
 					break;
 				case 17:
-					$monthBegin = 01;
-					$monthEnd = 04;				
+					$monthBegin = 1;
+					$monthEnd = 4;				
 					break;
 				case 18:
-					$monthBegin = 05;
-					$monthEnd = 08;				
+					$monthBegin = 5;
+					$monthEnd = 8;				
 					break;
 				case 19:
-					$monthBegin = 09;
+					$monthBegin = 9;
 					$monthEnd = 12;
 					break;
 				case 20:
-					$monthBegin = 01;
-					$monthEnd = 06;
+					$monthBegin = 1;
+					$monthEnd = 6;
 					break;
 				case 21:
-					$monthBegin = 07;
+					$monthBegin = 7;
 					$monthEnd = 12;
 					break;			
 				default:
+					$monthEnd = $monthBegin;
 					break;
 			}
 		} else {
@@ -420,28 +87,28 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 					$monthBegin = 12;			
 					break;
 				case 14:
-					$monthBegin = 03;
+					$monthBegin = 3;
 					break;
 				case 15:
-					$monthBegin = 06;
+					$monthBegin = 6;
 					break;
 				case 16:
-					$monthBegin = 09;
+					$monthBegin = 9;
 					break;
 				case 17:
-					$monthBegin = 01;
+					$monthBegin = 1;
 					break;
 				case 18:
-					$monthBegin = 05;
+					$monthBegin = 5;
 					break;
 				case 19:
-					$monthBegin = 09;
+					$monthBegin = 9;
 					break;
 				case 20:
-					$monthBegin = 01;
+					$monthBegin = 1;
 					break;
 				case 21:
-					$monthBegin = 07;
+					$monthBegin = 7;
 					break;			
 				default:
 					$monthBegin = $monthBegin;
@@ -449,34 +116,35 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 			}
 			switch ($monthEnd) {
 				case 13:
-					$monthEnd = 02;
+					$monthEnd = 2;
 					$yearEnd = $yearEnd+1;				
 					break;
 				case 14:
-					$monthEnd = 05;				
+					$monthEnd = 5;				
 					break;
 				case 15:				
-					$monthEnd = 08;				
+					$monthEnd = 8;				
 					break;
 				case 16:
 					$monthEnd = 11;				
 					break;
 				case 17:
-					$monthEnd = 04;				
+					$monthEnd = 4;				
 					break;
 				case 18:
-					$monthEnd = 08;				
+					$monthEnd = 8;				
 					break;
 				case 19:
 					$monthEnd = 12;
 					break;
 				case 20:
-					$monthEnd = 06;
+					$monthEnd = 6;
 					break;
 				case 21:
 					$monthEnd = 12;
 					break;			
 				default:
+					$monthEnd = $monthEnd;
 					break;
 			}
 		}
@@ -484,14 +152,46 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 	}
 
 	if ($dayBegin == 0) {
-		$dayBegin = 01;
+		$dayBegin = 1;
+		if ($dayEnd == 0) {
+			switch ($monthBegin) {
+				case 1:
+					$dayEnd = 31;
+					break;				
+				case 2:
+					$dayEnd = 28;
+					break;
+				case 3:
+					$dayEnd = 31;
+					break;
+				case 5:
+					$dayEnd = 31;
+					break;
+				case 7:
+					$dayEnd = 31;
+					break;
+				case 8:
+					$dayEnd = 31;
+					break;				
+				case 10:
+					$dayEnd = 31;
+					break;
+				case 12:
+					$dayEnd = 31;
+					break;
+				default:
+					$dayEnd = 30;
+					break;
+			}
+			
+		}
 	} 
 	if ($dayEnd == 0) {
 		switch ($dayBegin) {
 			case 28:
-				if ($monthBegin == 02) {
+				if ($monthBegin == 2) {
 					$monthEnd = $monthBegin+1;
-					$dayEnd = 01;
+					$dayEnd = 1;
 				} else {
 					$dayEnd = $dayBegin+1;
 				}				
@@ -499,19 +199,19 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 			case 31:
 				if ($monthBegin == 12) {
 					$yearEnd = $yearBegin+1;
-					$monthEnd = 01;
-					$dayEnd = 01;	
+					$monthEnd = 1;
+					$dayEnd = 1;	
 				} else {
 					$monthEnd = $monthBegin+1;
-					$dayEnd = 01;	
+					$dayEnd = 1;	
 				}	
 				break;	
 			case 32:
-				$dayBegin = 01;
-				$dayEnd = 05;
+				$dayBegin = 1;
+				$dayEnd = 5;
 				break;
 			case 33:
-				$dayBegin = 06;
+				$dayBegin = 6;
 				$dayEnd = 10;
 				break;
 			case 34:
@@ -531,7 +231,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 30;
 				break;
 			case 38:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				$dayEnd = 10;
 				break;
 			case 39:
@@ -543,7 +243,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 30;
 				break;
 			case 41:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				$dayEnd = 10;
 				break;
 			case 42:
@@ -555,7 +255,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 30;
 				break;
 			case 44:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				$dayEnd = 15;
 				break;
 			case 45:
@@ -571,10 +271,10 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 	} else {
 		switch ($dayBegin) {
 			case 32:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				break;
 			case 33:
-				$dayBegin = 06;
+				$dayBegin = 6;
 				break;
 			case 34:
 				$dayBegin = 11;
@@ -589,7 +289,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayBegin = 26;
 				break;
 			case 38:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				break;
 			case 39:
 				$dayBegin = 11;
@@ -598,7 +298,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayBegin = 21;
 				break;
 			case 41:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				break;
 			case 42:
 				$dayBegin = 11;
@@ -607,7 +307,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayBegin = 21;
 				break;
 			case 44:
-				$dayBegin = 01;
+				$dayBegin = 1;
 				break;
 			case 45:
 				$dayBegin = 16;
@@ -618,10 +318,10 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 		}					
 		switch ($dayEnd) {
 			case 32:
-				$dayEnd = 01;
+				$dayEnd = 1;
 				break;
 			case 33:
-				$dayEnd = 06;
+				$dayEnd = 6;
 				break;
 			case 34:
 				$dayEnd = 11;
@@ -636,7 +336,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 26;
 				break;
 			case 38:
-				$dayEnd = 01;
+				$dayEnd = 1;
 				break;
 			case 39:
 				$dayEnd = 11;
@@ -645,7 +345,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 21;
 				break;
 			case 41:
-				$dayEnd = 01;
+				$dayEnd = 1;
 				break;
 			case 42:
 				$dayEnd = 11;
@@ -654,7 +354,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				$dayEnd = 21;
 				break;
 			case 44:
-				$dayEnd = 01;
+				$dayEnd = 1;
 				break;
 			case 45:
 				$dayEnd = 16;
@@ -664,19 +364,14 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 				break;					
 		}
 	}
-	
 
 	if ($time == 2) {
 		$date = new DateTime($yearEnd.'-'.$monthEnd.'-'.$dayEnd);
-		$result = $date->format('Y-m-d H:i:s');	
-		echo "\n DATE END: ";
-		echo $result;
+		$result = $date->format('Y-m-d H:i:s');		
 		return $result;
 	} else {
 		$date = new DateTime($yearBegin.'-'.$monthBegin.'-'.$dayBegin);
-		$result = $date->format('Y-m-d H:i:s');	
-		echo "\n DATE BEGIN: ";
-		echo $result;
+		$result = $date->format('Y-m-d H:i:s');			
 		return $result;
 	}	
 
@@ -961,7 +656,7 @@ foreach($jahreszahlen as $jahreszahl) {
 						$momentID, 				// %id
 						'end', 					// %type
 						//MakeTimeEnd($zitat->datumA_code[2], $zitat->datumA_code[1], $zitat->datumA_code[0], $zitat->datumB_code[2], $zitat->datumB_code[1], $zitat->datumB_code[0]),	// %timestamp'
-						MakeTime("begin", $zitat->datumA_code[2], $zitat->datumA_code[1], $zitat->datumA_code[0], $zitat->datumB_code[2], $zitat->datumB_code[1], $zitat->datumB_code[0]),
+						MakeTime(2, $zitat->datumA_code[2], $zitat->datumA_code[1], $zitat->datumA_code[0], $zitat->datumB_code[2], $zitat->datumB_code[1], $zitat->datumB_code[0]),
 						$zitat->datumB_code[0],	// %day_id
 						$zitat->datumB_code[1],	// %month_id
 						$zitat->datumB_code[2],	// %year
