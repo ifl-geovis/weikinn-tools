@@ -35,7 +35,48 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 	}
 
 	if ($monthBegin == 0) {
-		$monthBegin = 1;
+		if ($monthEnd == 0) {
+			$monthBegin = 1;
+		} else {
+			switch ($monthEnd) {
+				case 13:
+					$monthBegin = 12;
+					$monthEnd = 2;										
+					break;
+				case 14:
+					$monthBegin = 3;
+					$monthEnd = 5;				
+					break;
+				case 15:						
+					$monthBegin = 6;										
+					$monthEnd = 8;															
+					break;
+				case 16:
+					$monthBegin = 9;
+					$monthEnd = 11;				
+					break;
+				case 17:
+					$monthBegin = 1;
+					$monthEnd = 4;				
+					break;
+				case 18:
+					$monthBegin = 5;
+					$monthEnd = 8;				
+					break;
+				case 19:
+					$monthBegin = 9;
+					$monthEnd = 12;
+					break;
+				case 20:
+					$monthBegin = 1;
+					$monthEnd = 6;
+					break;
+				case 21:
+					$monthBegin = 7;
+					$monthEnd = 12;
+					break;		
+			}
+		}		
 	} else {
 		if ($monthEnd == 0) {
 			switch ($monthBegin) {
@@ -373,9 +414,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 		$date = new DateTime($yearBegin.'-'.$monthBegin.'-'.$dayBegin);
 		$result = $date->format('Y-m-d H:i:s');			
 		return $result;
-	}	
-
-
+	}
 }
 
 $weikinnSetupFile = "-- Weikinn Setup File\n";
@@ -390,28 +429,17 @@ $eventsFile = 'COPY event (id, quote_id, project_id, created_by, modified_by, pu
 $eventTemplate = "%id	%quote_id	$GLOBAL_PROJECT_ID	$GLOBAL_CREATED_BY	\\N	true	%comment	%period_id	%position_id	%code_id	$GLOBAL_SOURCE_ID	\\N	\\N\n";
 $eventVars = array('%id','%quote_id','%comment','%period_id','%position_id','%code_id');
 $eventID = 220000;
-/*
-209;"precipitation intensity";999;"information available";0;"Information vorhanden"
-204;"temperature intensity";999;"information available";0;"Information vorhanden"
-203;"cloud cover";999;"information available";0;"Information vorhanden"
-252;"flood intensity";999;"information available";0;"Information vorhanden"
-214;"wind force";999;"information available";0;"Information vorhanden"
-213;"wind direction";999;"information available";0;"Information vorhanden"
-253;"snow intensity";999;"information available";0;"Information vorhanden"
-202;"measurement";99;"Barometrische Meßdaten in der Quelle vorhande";1;"Barometrische Meßdaten in der Quelle vorhande"
-155;"temperature intensity";99;"Instrumentenmessdaten vorhanden";1;"Instrumentenmessdaten vorhanden"
-*/
 
 $eventCodes = array(
-	'R'=>array(204,'Temperatur'),
-	'S'=>array(209,'Niederschlag'),
-	'T'=>array(318,'Luftdruck'),
-	'U'=>array(316,'Luftfeuchtigkeit'),
-	'V'=>array(314,'Wind'),
-	'W'=>array(90,'Gewitter'),
-	'X'=>array(116,'Hagel'),
-	'Y'=>array(319,'Sonstiges')
-	);
+	'R'=>array(217,'Temperatur'),
+	'S'=>array(94,'Niederschlag'),
+	'T'=>array(366,'Luftdruck'),
+	'U'=>array(383,'Luftfeuchtigkeit'),
+	'V'=>array(23,'Wind'),
+	'W'=>array(307,'Gewitter'),
+	'X'=>array(113,'Hagel'),
+	'Y'=>array(565,'Sonstiges')
+);
 
 $momentsFile = 'COPY timing.moment (id, type, "time", calendar_id, hour_id, day_id, month_id, year, hour_certain, day_certain, month_certain, year_certain, created_by, modified_by) FROM stdin;'."\n";
 $momentTemplate = "%id	%type	%timestamp	$GLOBAL_CALENDAR_ID	\\N	%day_id	%month_id	%year	\\N	\\N	\\N \\N $GLOBAL_CREATED_BY	\\N\n";
@@ -423,6 +451,17 @@ $periodsFile = 'COPY timing.period (id, description, begin_moment_id, end_moment
 $periodTemplate = "%id	\\N	%begin_moment_id	%end_moment_id	$GLOBAL_CREATED_BY	\\N\n";
 $periodVars = array('%id', '%begin_moment_id', '%end_moment_id');
 $periodID = 316000;
+
+$codingsetsFile = 'COPY coding.codingset (id, created_by) FROM stdin;'."\n";
+$codingsetTemplate = "%id	$GLOBAL_CREATED_BY\n";
+$codingsetVars = array('%id');
+$codingsetID = 320000;
+
+$codingitemsFile = 'COPY coding.codingitems (id, codingset_id, node_id, created_by) FROM stdin;'."\n";
+$codingitemTemplate = "%id	%codingset_id	%node_id	$GLOBAL_CREATED_BY
+\n";
+$codingitemVars = array('%id	%codingset_id	%node_id');
+$codingitemID = 500000;
  
 
 
@@ -712,6 +751,14 @@ fclose($f);
 
 $f = fopen($ordner_ausgabe."og_timing_moments__".date('Y-m-d__H-i').".sql",'w');
 fwrite( $f, $momentsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."og_codingitems__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $codingitemsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."og_codingsets__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $codingsetsFile );
 fclose($f);
 
 // Protokoll speichern
