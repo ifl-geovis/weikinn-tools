@@ -85,11 +85,6 @@ class Weikinn {
 		if ($this->_jahreszahlen == null) {
 			$this->dateinamen();
 		}
-		
-		$log = $this->_jahreszahlen;
-		echo "\n ---- \n";
-		print_r($log);
-		echo "\n ----";
 		return $this->_jahreszahlen;
 	}
 	
@@ -105,8 +100,8 @@ class Weikinn {
 			$files = glob($ordner_jahre."*.xls");
 			foreach ($files as $importfilename) {				
 				$year = explode("_",$importfilename);
-				$year = trim($year[1].$year[2], ".xls");				
-				//$year = trim($year[1]."-".$year[2], ".xls");				
+				//$year = trim($year[1], ".xls");
+				$year = trim($year[1].$year[2], ".xls");			
 				
 				$this->_jahreszahlen[] = $year;
 				$this->_dateinamen[$year] = $importfilename;
@@ -116,7 +111,7 @@ class Weikinn {
 			$files = glob($ordner_jahre_og."*.xls");
 			foreach ($files as $importfilename) {				
 				$year = explode("_",$importfilename);
-				$year = trim($year[1]."-".$year[2], ".xls");					
+				$year = trim($year[1], ".xls");
 				
 				$this->_jahreszahlen[] = $year;
 				$this->_dateinamen[$year] = $importfilename;
@@ -236,7 +231,8 @@ class Jahr {
 		$this->_rowCounter = 2;
 		
 		if ($this->_rowsEstimated<10) {
-			die( $this->dateiname . " ist fehlerhaft." );
+			//die( $this->dateiname . " ist fehlerhaft." );
+			echo "geringe Zeilennummer";
 		}
 		
 		$this->zettelNummer = 0;

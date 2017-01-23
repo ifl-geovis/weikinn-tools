@@ -100,7 +100,8 @@ class Weikinn {
 			$files = glob($ordner_jahre."*.xls");
 			foreach ($files as $importfilename) {				
 				$year = explode("_",$importfilename);
-				$year = $year[1];
+				$year = trim($year[1], ".xls");
+				//$year = trim($year[1].$year[2], ".xls");			
 				
 				$this->_jahreszahlen[] = $year;
 				$this->_dateinamen[$year] = $importfilename;
@@ -110,7 +111,7 @@ class Weikinn {
 			$files = glob($ordner_jahre_og."*.xls");
 			foreach ($files as $importfilename) {				
 				$year = explode("_",$importfilename);
-				$year = $year[1];
+				$year = trim($year[1], ".xls");
 				
 				$this->_jahreszahlen[] = $year;
 				$this->_dateinamen[$year] = $importfilename;

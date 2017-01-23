@@ -2,18 +2,23 @@
 error_reporting(E_ALL);
 require_once( 'weikinn_1571.php' );
 
-$GLOBAL_PROJECT_ID 	= 38;
-$GLOBAL_SOURCE_ID	= 3000;
+$GLOBAL_PROJECT_ID 	= 1753;
+$GLOBAL_SOURCE_ID	= 10664;
 $GLOBAL_CREATED_BY 	= 1;
 $GLOBAL_PUBLISH 	= 't';
 $GLOBAL_TIMESTAMP	= date('Y-m-d H:i:s').'.0+1';
 $GLOBAL_CALENDAR_ID = 1;
+$GLOBAL_POSITION_ID = 314210; //unknown position
 
 $ordner			=	'./temp/weikinn';
 $ordner_ausgabe	= 	$ordner.'/sql/';
 
-$nameID = 12000;
-$positionID = 314210;
+$quoteID = 140002;
+$eventID = 353515;
+$momentID = 628409;
+$periodID = 314205;
+$codingsetID = 314219;
+$codingitemID = 480539;
 
 function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd, $dayEnd) {
 	$yearBegin = intval($yearBegin);
@@ -414,9 +419,7 @@ function MakeTime($time, $yearBegin, $monthBegin, $dayBegin, $yearEnd, $monthEnd
 		$date = new DateTime($yearBegin.'-'.$monthBegin.'-'.$dayBegin);
 		$result = $date->format('Y-m-d H:i:s');			
 		return $result;
-	}	
-
-
+	}
 }
 
 $weikinnSetupFile = "-- Weikinn Setup File\n";
@@ -425,12 +428,11 @@ $weikinnCleanupFile = "-- Weikinn Cleanup File\n\n-- Removes all data from THIS 
 $quotesFile = 'COPY grouping.quote (id, source_id, project_id, created_by, modified_by, text, page, file, text_vector, public, comment) FROM stdin;'."\n";
 $quoteTemplate = "%id	$GLOBAL_SOURCE_ID	$GLOBAL_PROJECT_ID	$GLOBAL_CREATED_BY	\\N	%text	%page	%file	\\N	true	%comment\n";
 $quoteVars = array('%id','%text','%page','%file','%comment');
-$quoteID = 140000;
 
-$eventsFile = 'COPY event (id, quote_id, project_id, created_by, modified_by, public, comment, period_id, position_id, code_id, source_id, license_id, doi, valid) FROM stdin;'."\n";
-$eventTemplate = "%id	%quote_id	$GLOBAL_PROJECT_ID	$GLOBAL_CREATED_BY	\\N	true	%comment	%period_id	%position_id	%code_id	$GLOBAL_SOURCE_ID	\\N	\\N\n";
-$eventVars = array('%id','%quote_id','%comment','%period_id','%position_id','%code_id');
-$eventID = 220000;
+
+$eventsFile = 'COPY grouping.event (id, quote_id, project_id, created_by, modified_by, public, comment, period_id, position_id, codingset_id, source_id, license_id, doi, valid) FROM stdin;'."\n";
+$eventTemplate = "%id	%quote_id	$GLOBAL_PROJECT_ID	$GLOBAL_CREATED_BY	\\N	true	%comment	%period_id	$GLOBAL_POSITION_ID	%codingset_id	$GLOBAL_SOURCE_ID	\\N	\\N	\\N\n";
+$eventVars = array('%id','%quote_id','%comment','%period_id','%codingset_id');
 
 $eventCodes = array(
 	'R'=>array(217,'Temperatur'),
@@ -443,16 +445,24 @@ $eventCodes = array(
 	'Y'=>array(565,'Sonstiges')
 );
 
-$momentsFile = 'COPY timing.moment (id, type, "time", calendar_id, hour_id, day_id, month_id, year, hour_certain, day_certain, month_certain, year_certain, created_by, modified_by) FROM stdin;'."\n";
-$momentTemplate = "%id	%type	%timestamp	$GLOBAL_CALENDAR_ID	\\N	%day_id	%month_id	%year	\\N	\\N	\\N \\N $GLOBAL_CREATED_BY	\\N\n";
+$momentsFile = 'COPY timing.moment (id, type, "time", calendar_id, hour_id, day_id, month_id, year, created_by, modified_by) FROM stdin;'."\n";
+$momentTemplate = "%id	%type	%timestamp	$GLOBAL_CALENDAR_ID	\\N	%day_id	%month_id	%year	$GLOBAL_CREATED_BY	\\N\n";
 $momentVars = array('%id', '%type', '%timestamp', '%day_id', '%month_id', '%year');
-$momentID = 650000;
 
 
 $periodsFile = 'COPY timing.period (id, description, begin_moment_id, end_moment_id,  created_by, modified_by) FROM stdin;'."\n";
 $periodTemplate = "%id	\\N	%begin_moment_id	%end_moment_id	$GLOBAL_CREATED_BY	\\N\n";
 $periodVars = array('%id', '%begin_moment_id', '%end_moment_id');
-$periodID = 316000;
+
+
+$codingsetsFile = 'COPY coding.codingset (id, created_by) FROM stdin;'."\n";
+$codingsetTemplate = "%id	$GLOBAL_CREATED_BY\n";
+$codingsetVars = array('%id');
+
+
+$codingitemsFile = 'COPY coding.codingitems (id, codingset_id, node_id, created_by) FROM stdin;'."\n";
+$codingitemTemplate = "%id	%codingset_id	%node_id	$GLOBAL_CREATED_BY\n";
+$codingitemVars = array('%id',	'%codingset_id',	'%node_id');
  
 
 
@@ -472,11 +482,9 @@ $weikinnSetupFile .= "\n-- INSERT INTO tag( id, taggroup_id, name, description, 
 
 $ORT2_TAG_ID = 1002;
 		
-$weikinnCleanupFile .= "\nDELETE FROM event WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
-$weikinnCleanupFile .= "\nDELETE FROM name WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
-$weikinnCleanupFile .= "\nDELETE FROM location WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
-$weikinnCleanupFile .= "\nDELETE FROM quote WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
-$weikinnCleanupFile .= "\nDELETE FROM source WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
+$weikinnCleanupFile .= "\nDELETE FROM grouping.event WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
+$weikinnCleanupFile .= "\nDELETE FROM grouping.quote WHERE \"timestamp\"='$GLOBAL_TIMESTAMP';";
+
 
 echo "Erzeuge Event-Codes...\n\n";
 
@@ -613,17 +621,40 @@ foreach($jahreszahlen as $jahreszahl) {
 			
 			//if (1===2) {
 			foreach( $zitat->events as $event_col) {
+
+			// tambora coding
+				//node_id
 				$eventCode = $eventCodes[$event_col][0];
-				
-				$eventVars = array('%id','%quote_id','%comment','%period_id','%position_id','%code_id');
+			
+				//coding.codingset
+				$codingsetVars = array('%id');
 				$replace = array(
-					$eventID,	// %id
-					$quoteID,	// %quote_id
-					$comment,	// %comment
-					$periodID, 	// %period_id
-					$eventCode,	// %code_id
-					$positionID,// %name_id							
-					);
+					$codingsetID,	//codingset_id
+				);
+				$codingsetZeile = str_replace( $codingsetVars, $replace, $codingsetTemplate );
+				$codingsetsFile .= $codingsetZeile;
+
+				//coding.codingitems
+				$codingitemVars = array('%id','%codingset_id','%node_id');
+				$replace = array(
+					$codingitemID,	//codingitems_id
+					$codingsetID,	//codingset_id
+					$eventCode,		//node_id
+				);
+				$codingitemsZeile = str_replace( $codingitemVars, $replace, $codingitemTemplate );
+				$codingitemsFile .= $codingitemsZeile;
+
+				
+			// tambora event
+								
+				$eventVars = array('%id','%quote_id','%comment','%period_id','%codingset_id');
+				$replace = array(
+					$eventID,		// %id
+					$quoteID,		// %quote_id
+					$comment,		// %comment
+					$periodID, 		// %period_id
+					$codingsetID,	// %codingset_id	
+				);
 				
 				$eventZeile = str_replace( $eventVars, $replace, $eventTemplate );
 				$eventsFile .= $eventZeile;
@@ -637,28 +668,14 @@ foreach($jahreszahlen as $jahreszahl) {
 					$periodID, 		// %id
 					$momentID, 	 	// %begin_moment_id
 					$momentID+1,	// %end_moment_id					
-					);
+				);
 				
 				$periodZeile = str_replace( $periodVars, $replace, $periodTemplate );
 				$periodsFile .= $periodZeile;
 
 				$periodID++;
 
-			// timing.moment 
-
-				// $zitat->datum_description,	// %time_description					
-				// $zitat->datumA_code[0],	// %day_id_begin
-				// $zitat->datumB_code[0],	// %day_id_end
-				// $zitat->datumA_code[1],	// %month_id_begin
-				// $zitat->datumB_code[1],	// %month_id_end
-				// $zitat->datumA_code[2],	// %year_id_begin
-				// $zitat->datumB_code[2],	// %year_id_end
-				// $zitat->datumA_certain[2],	// %year_begin_certain
-				// $zitat->datumB_certain[2],	// %year_end_certain
-				// $zitat->datumA_certain[1],	// %month_begin_certain
-				// $zitat->datumB_certain[1],	// %month_end_certain
-				// $zitat->datumA_certain[0],	// %day_begin_certain
-				// $zitat->datumB_certain[0],	// %day_end_certain			
+			// timing.moment 				
 				
 				// %year_id_begin)
 				if (!empty($zitat->datumA_code[2])) {
@@ -670,7 +687,7 @@ foreach($jahreszahlen as $jahreszahl) {
 						$zitat->datumA_code[0],	// %day_id
 						$zitat->datumA_code[1],	// %month_id
 						$zitat->datumA_code[2],	// %year
-						);
+					);
 					
 					$momentZeile = str_replace( $momentVars, $replace, $momentTemplate );
 					$momentsFile .= $momentZeile;
@@ -690,19 +707,19 @@ foreach($jahreszahlen as $jahreszahl) {
 						$zitat->datumB_code[0],	// %day_id
 						$zitat->datumB_code[1],	// %month_id
 						$zitat->datumB_code[2],	// %year
-						);
+					);
 					
 					$momentZeile = str_replace( $momentVars, $replace, $momentTemplate );
 					$momentsFile .= $momentZeile;
 
 					$momentID++;
 				}
-
 					
-				}
-				
+				}				
 				
 				$eventID++;
+				$codingsetID++;
+				$codingitemID++;
 			}
 			
 			$quoteID++;
@@ -711,8 +728,6 @@ foreach($jahreszahlen as $jahreszahl) {
 		echo "\n";
 	}
 }
-
-
 
 
 $f = fopen($ordner_ausgabe."og_setup__".date('Y-m-d__H-i').".sql",'w');
@@ -725,23 +740,30 @@ fwrite( $f, $weikinnCleanupFile );
 fclose($f);
 
 
-$f = fopen($ordner_ausgabe."og_quotes__".date('Y-m-d__H-i').".sql",'w');
+$f = fopen($ordner_ausgabe."05_og_quotes__".date('Y-m-d__H-i').".sql",'w');
 //$f = fopen($ordner_ausgabe."quotes__.sql",'w');
 fwrite( $f, $quotesFile );
 fclose($f);
 
-
-$f = fopen($ordner_ausgabe."og_events__".date('Y-m-d__H-i').".sql",'w');
-//$f = fopen($ordner_ausgabe."events__.sql",'w');
-fwrite( $f, $eventsFile );
+$f = fopen($ordner_ausgabe."01_og_codingsets__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $codingsetsFile );
 fclose($f);
 
-$f = fopen($ordner_ausgabe."og_periods__".date('Y-m-d__H-i').".sql",'w');
+$f = fopen($ordner_ausgabe."02_og_codingitems__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $codingitemsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."03_og_timing_moments__".date('Y-m-d__H-i').".sql",'w');
+fwrite( $f, $momentsFile );
+fclose($f);
+
+$f = fopen($ordner_ausgabe."04_og_periods__".date('Y-m-d__H-i').".sql",'w');
 fwrite( $f, $periodsFile );
 fclose($f);
 
-$f = fopen($ordner_ausgabe."og_timing_moments__".date('Y-m-d__H-i').".sql",'w');
-fwrite( $f, $momentsFile );
+$f = fopen($ordner_ausgabe."06_og_events__".date('Y-m-d__H-i').".sql",'w');
+//$f = fopen($ordner_ausgabe."events__.sql",'w');
+fwrite( $f, $eventsFile );
 fclose($f);
 
 // Protokoll speichern
