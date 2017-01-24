@@ -500,8 +500,6 @@ $bilder = new Bilder();
 $protokoll = array();
 
 $jahreszahlen = $weikinn->jahreszahlen() ;
-
-
 foreach($jahreszahlen as $jahreszahl) {
 	if (!$weikinn->istGeokodiert($jahreszahl)) {
 		echo $jahreszahl.": Quote $quoteID Event $eventID > ";
@@ -580,7 +578,7 @@ foreach($jahreszahlen as $jahreszahl) {
 			
 			$filenames = array();
 			foreach ($zitat->C as $c) {
-				$filenames[] = $bilder->findImage($jahreszahl, $c);
+				$filenames[] = $bilder->findImage($jahreszahl, $c);					 			
 			}	
 			$filenames = implode(";;",array_unique($filenames));
 			

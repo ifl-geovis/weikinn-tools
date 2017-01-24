@@ -112,7 +112,7 @@ class Weikinn {
 			foreach ($files as $importfilename) {				
 				$year = explode("_",$importfilename);
 				//$year = trim($year[1], ".xls");
-				$year = trim($year[1]."-".$year[2], ".xls");			
+				$year = trim($year[1]."_".$year[2], ".xls");			
 				
 				$this->_jahreszahlen[] = $year;
 				$this->_dateinamen[$year] = $importfilename;
@@ -925,7 +925,7 @@ class Zettel  {
 		// \]\s=\>\s\d*
 		$tagRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab|Anf\.)?\s?(\[?([1-3]?\d)?(I|II|III)?\.\s?(Dekade|Pentade|H.lfte)?)?(\s?\[?(Anfang|Mitte|Ende)?\]?)?\Z';
 		$monatRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab)?\s?(Januar|Februar|M.rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)?(Jan\.|Feb\.|Febr\.|Apr\.|Aug\.|Sep\.|Sept\.|Okt\.|Nov\.|Dez\.)?(Fr.hling|Fr.hjahr|Sommer|Herbst|Winter)?(\d\.\s\H.lfte)?(Anfang|Mitte|Ende)?\]?\Z';
-		$jahrRP = '\A\[?\d{4}\]?\Z'; // Bei Winter ist eckige Klammer nicht unsicher, sondern Vorjahr
+		$jahrRP = '\A\[?\d{1,4}\]?\Z'; // Bei Winter ist eckige Klammer nicht unsicher, sondern Vorjahr
 		
 		//preg_match braucht hinten und vorne am Pattern ein #
 		$this->datum = "";
@@ -1790,7 +1790,8 @@ class Ortstabelle {
 }
 
 
-$bilderfilename = $ordner."/dateinamen.txt";
+$bilderfilename = $ordner."/dateinamen_1571.txt";
+
 class Bilder {
 	
 	public $jahre = array();
@@ -1801,15 +1802,15 @@ class Bilder {
 	public $letzteZettelNummer = array();
 	
 	public $fehler = array();
-	
-	
+	public $bilder = array();
+		
 	function __construct($bilderfile=null) {
 		global $bilderfilename;
 		
 		if (isset($bilderfile)) {
 			$f = file_get_contents( $bilderfile );
 		} else {
-			$f = file_get_contents( $bilderfilename );
+			$f = file_get_contents( $bilderfilename );			
 		}
 		
 		//$lines = explode( PHP_EOL, $f );
@@ -1828,127 +1829,37 @@ class Bilder {
 			}
 			
 			$filenodes = explode( "\\", $line2);
-			
+						
 			if (count($filenodes)==3) {
 			
-				$subfolder = explode( "_", $filenodes[1]);
-				$jahr = $subfolder[1];
+				//$subfolder = explode( "_", $filenodes[1]);
+				$subfolder = $filenodes[1];
+				$jahr = $subfolder;
+									
+				$filename = explode( ".", $filenodes[2]);
+				$filename = explode( "_", $filename[0]);					
+				$zettelnummer = $filename[1];		
 				
-				
-				if ($jahr>999 && $jahr<2000) {
-					if (!isset($this->jahre[$jahr])) {
-						$this->jahre[$jahr] = array();
-						$this->jahrcodes[$jahr] = $subfolder[0];
+				$this->bilder[] = array(
+					0 => $filenodes[1], 	// 0 jahresordner
+					1 => $zettelnummer, 	//1	zettelnr
+					2 => $filenodes[2], 	//2	datei
+					3 => false,		  		//3 has follow-up scan
+					4 => false,		  		//4 has been requested
+				);
+	// TODO 
+	// Test, ob Fortgesetzter Scan
+			/*	$length = count($this->jahre[$jahr]);
+				if ($length>1) {
+					$previousBild = $this->jahre[$jahr][$length-2];
+					if ($previousBild[2] == $bild[2]) {
+						$this->jahre[$jahr][$length-2][6] = true;
 					}
-					
-					$filename = explode( ".", $filenodes[2]);
-					
-					// Ausnahme für 1800 und 1802
-					// Hier fehlt der Code vor der Zettelnummer
-					if ($jahr==1800 || $jahr==1801) {
-						$filename = $this->jahrcodes[$jahr]."_".$filename[0];
-					} else {
-						$filename = $filename[0];
-					}
-					
-					
-					$filename = explode( "_", $filename);
-					$zettelnummer = $filename[1];
-					
-					// Korrekturen für Geo Import
-					
-					if ($jahr==1796 && $zettelnummer>174) {
-						$zettelnummer -= 1;
-					}
-					if ($jahr==1898 && $zettelnummer>19) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1904 && $zettelnummer>18) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1905 && $zettelnummer>57) {
-						$zettelnummer += 1;
-					}
-					
-					
-					// Korrekturen für OG Import
-					if ($jahr==1748 && $zettelnummer>278) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1750 && $zettelnummer>177) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1784 && $zettelnummer>12 && $zettelnummer<424) {
-						$zettelnummer -= 1;
-					}
-					if ($jahr==1827 && $zettelnummer>312) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1838 && $zettelnummer>11) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1865 && $zettelnummer>3) {
-						$zettelnummer += 1;
-					}
-					if ($jahr==1884 && $zettelnummer>92) {
-						$zettelnummer -= 1;
-					}
-					
-					
-					$dateijahr = "";
-					$dateidatum = array();
-					$dateiort = array();
-					$dateijahrpos = 2;
-					while ( $dateijahr=="" && $dateijahrpos<count($filename)) {
-						if ( ($filename[$dateijahrpos]==$jahr) 
-							|| ($filename[$dateijahrpos]==($jahr-1)) ) {
-							$dateijahr = $filename[$dateijahrpos];
-							$dateijahrpos++;
-						} else {
-							$dateidatum[] = $filename[$dateijahrpos];
-							$dateijahrpos++;
-						}
-					}
-					
-					if ($dateijahrpos==(count($filename))) {
-						$this->fehler[] = "fehlformatierter Dateiname in Zeile:\n$line";
-					}
-					
-					while ($dateijahrpos<count($filename)) {
-						$dateiort[] = $filename[$dateijahrpos];
-						$dateijahrpos++;
-					}
-					
-					$dateiort = implode(" ",$dateiort);
-					
-					$bild = array();
-					$bild[] = trim($line2); 		// 0	url
-					$bild[] = trim($filenodes[2]); //1	file
-					$bild[] = $zettelnummer; //2	nummer
-					$bild[] = $dateijahr;	  //3 jahr aus dateiname
-					$bild[] = $dateidatum;	  //4 array: datum aus dateiname
-					$bild[] = $dateiort;	  //5 array: ort & co aus dateiname
-					$bild[] = false;		  //6 has follow-up scan
-					$bild[] = false;		  //7 has been requested
-					
-					$this->jahre[$jahr][] = $bild;
-					
-					// Test, ob Fortgesetzter Scan
-					$length = count($this->jahre[$jahr]);
-					if ($length>1) {
-						$previousBild = $this->jahre[$jahr][$length-2];
-						if ($previousBild[2] == $bild[2]) {
-							$this->jahre[$jahr][$length-2][6] = true;
-						}
-					}
-					
-					$this->letzteZettelNummer[$jahr] = $zettelnummer;
-					
-				} else {
-					$this->fehler[] = "ungueltiges Jahr in Zeile: $line";
-				}
+				}*/
+								
 			}
 		}
+
 	}
 	
 	function istJahrKonsistent( $year, $maxZettel) {
@@ -1958,38 +1869,42 @@ class Bilder {
 			return false;
 		}
 	}
-	
+
+
 	function findImage($year, $sheet, $date=null, $place=null) {
-		$this->jahreQueried[$year] = 1;
-		//$length = count( $this->jahre[$year] );
+		// zettelnummer => $sheet[0]
+		// jahresordner => $year
 		
-		if (isset($this->jahre[$year])) {
-			$voriges_bild = null;
-			foreach ($this->jahre[$year] as $id=>$bild) {
-				if ($bild[2]==$sheet) {
-					$this->jahre[$year][$id][7] = true;
-					$result = $bild[1];
+		$voriges_bild = null;
+		foreach ($this->bilder as $id=>$bild) {
+			
+			if ($bild[0]==$year && $bild[1]==$sheet) {				
+				$this->bilder[$id][4] = true;
+				$result = $bild[2];
+								
+				$voriges_bild = $bild;
+				$vorige_id = $id;
+				while ($voriges_bild[3] === false) {
+					echo "\n more imgs ";
 					
-					$voriges_bild = $bild;
-					$vorige_id = $id;
-					while ($voriges_bild[6]) {
-						$folge_id = $vorige_id+1;
-						$folge_bild = $this->jahre[$year][$folge_id];
-						
-						$result .= ";;".$folge_bild[1];
-						$this->jahre[$year][$folge_id][7] = true;
-						
-						$voriges_bild = $folge_bild;
-						$vorige_id = $folge_id;
-					}
-					return $result;
+					$folge_id = $vorige_id+1;
+					$folge_bild = $this->bilder[$folge_id];
+					echo "\n ";
+					print_r($this->bilder[$folge_id]);
+					echo "--\n";
 					
-				}
-			}
+					$result .= ";;".$folge_bild[2];
+					$this->bilder[$folge_id][4] = true;
+					
+					$voriges_bild = $folge_bild;
+					$vorige_id = $folge_id;				
+				}				
+				return $result;				
+			} 
 		}
-		return null;
+		
 	}
-	
+
 	
 	// create a report on files that have not been queried
 	function report() {
