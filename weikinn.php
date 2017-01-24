@@ -924,7 +924,7 @@ class Zettel  {
 		// \]\s=\>\s\d*
 		$tagRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab|Anf\.)?\s?(\[?([1-3]?\d)?(I|II|III)?\.\s?(Dekade|Pentade|H.lfte)?)?(\s?\[?(Anfang|Mitte|Ende)?\]?)?\Z';
 		$monatRP = '\A\[?(um|Um|ca\.|ca|nach|Nach|gegen|Gegen|vor|Vor|nahe|Nahe|ab)?\s?(Januar|Februar|M.rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)?(Jan\.|Feb\.|Febr\.|Apr\.|Aug\.|Sep\.|Sept\.|Okt\.|Nov\.|Dez\.)?(Fr.hling|Fr.hjahr|Sommer|Herbst|Winter)?(\d\.\s\H.lfte)?(Anfang|Mitte|Ende)?\]?\Z';
-		$jahrRP = '\A\[?\d{4}\]?\Z'; // Bei Winter ist eckige Klammer nicht unsicher, sondern Vorjahr
+		$jahrRP = '\A\[?\d{1,4}\]?\Z'; // Bei Winter ist eckige Klammer nicht unsicher, sondern Vorjahr
 		
 		//preg_match braucht hinten und vorne am Pattern ein #
 		$this->datum = "";
@@ -1568,39 +1568,36 @@ EVENT;;R::%R%;;S::%S%;;T::%T%;;U::%U%;;V::%V%;;W::%W%;;X::%X%;;Y::%Y%;;
 
 
 
-
-
-
 class Ortstabelle {
 
-/*
-1 Ort	
-2 Ort 2 (Datenbank)	
-3 Ort 3 (Ereignisse)	
-4 übertragener Ort (Ort, Quelle)	
-5 Nord_Süd	
-6 Ost_West
-7 Ausrichtung
-8 Winkel von Nord
-9 lange Achse
-10 kurze Achse
-	Höhe
-	Maßeinheit
-	Ebene 3
-14 Ebene 2
-	Ebene 1
-	Land
-	Landschaft
-	Kontinent
-19 Art
-	genauere Bezeichnung
-	Anmerkung
-	Identifikation Ort
-	Vorkommen Schreibweise
-24 (googlemaps url)
-	DGM_Hoehe
+	/*
+	1 Ort	
+	2 Ort 2 (Datenbank)	
+	3 Ort 3 (Ereignisse)	
+	4 übertragener Ort (Ort, Quelle)	
+	5 Nord_Süd	
+	6 Ost_West
+	7 Ausrichtung
+	8 Winkel von Nord
+	9 lange Achse
+	10 kurze Achse
+		Höhe
+		Maßeinheit
+		Ebene 3
+	14 Ebene 2
+		Ebene 1
+		Land
+		Landschaft
+		Kontinent
+	19 Art
+		genauere Bezeichnung
+		Anmerkung
+		Identifikation Ort
+		Vorkommen Schreibweise
+	24 (googlemaps url)
+		DGM_Hoehe
 
-*/
+	*/
 
 
 	public $locationTypes = array(
@@ -1808,7 +1805,7 @@ class Bilder {
 		if (isset($bilderfile)) {
 			$f = file_get_contents( $bilderfile );
 		} else {
-			$f = file_get_contents( $bilderfilename );
+			$f = file_get_contents( $bilderfilename );			
 		}
 		
 		//$lines = explode( PHP_EOL, $f );
@@ -1827,12 +1824,11 @@ class Bilder {
 			}
 			
 			$filenodes = explode( "\\", $line2);
-			
+
 			if (count($filenodes)==3) {
 			
 				$subfolder = explode( "_", $filenodes[1]);
-				$jahr = $subfolder[1];
-				
+				$jahr = $subfolder[0];
 				
 				if ($jahr>999 && $jahr<2000) {
 					if (!isset($this->jahre[$jahr])) {
@@ -1986,7 +1982,7 @@ class Bilder {
 				}
 			}
 		}
-		return null;
+		return null;		
 	}
 	
 	

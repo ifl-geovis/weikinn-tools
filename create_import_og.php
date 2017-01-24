@@ -580,7 +580,7 @@ foreach($jahreszahlen as $jahreszahl) {
 			
 			$filenames = array();
 			foreach ($zitat->C as $c) {
-				$filenames[] = $bilder->findImage($jahreszahl, $c);
+				$filenames[] = $bilder->findImage($jahreszahl, $c);					
 			}	
 			$filenames = implode(";;",array_unique($filenames));
 			
