@@ -1821,7 +1821,7 @@ class Bilder {
 		$jahr = 0;
 		$zettelnummer = 0;
 		
-		foreach( $lines as $line ) {
+		foreach( $lines as $id=>$line ) {
 			$line2 = preg_replace('/[^(\x20-\x7F)|\r\n]*/','', $line);
 			
 			if ($line2!=$line) {
@@ -1847,18 +1847,18 @@ class Bilder {
 					3 => false,		  		//3 has follow-up scan
 					4 => false,		  		//4 has been requested
 				);
-	// TODO 
-	// Test, ob Fortgesetzter Scan
-			/*	$length = count($this->jahre[$jahr]);
+	
+			// Test, ob Fortgesetzter Scan
+				$length = count($this->bilder);
 				if ($length>1) {
-					$previousBild = $this->jahre[$jahr][$length-2];
-					if ($previousBild[2] == $bild[2]) {
-						$this->jahre[$jahr][$length-2][6] = true;
+					$previousBild = $this->bilder[$id-1];
+					if ($previousBild[1] == $this->bilder[$id][1]) {
+						$this->bilder[$id-1][3] = true;
 					}
-				}*/
+				}
 								
 			}
-		}
+		}		
 
 	}
 	
@@ -1884,15 +1884,14 @@ class Bilder {
 								
 				$voriges_bild = $bild;
 				$vorige_id = $id;
-				while ($voriges_bild[3] === false) {
-					echo "\n more imgs ";
-					
+				echo $voriges_bild[3];
+				if ($voriges_bild[3]) {
+					echo "\n mehr bilder ";
+					echo $vorige_id;
+
 					$folge_id = $vorige_id+1;
 					$folge_bild = $this->bilder[$folge_id];
-					echo "\n ";
-					print_r($this->bilder[$folge_id]);
-					echo "--\n";
-					
+										
 					$result .= ";;".$folge_bild[2];
 					$this->bilder[$folge_id][4] = true;
 					
@@ -1901,8 +1900,8 @@ class Bilder {
 				}				
 				return $result;				
 			} 
-		}
-		
+		} 
+				
 	}
 
 	
