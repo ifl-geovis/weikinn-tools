@@ -6,7 +6,9 @@ copyrighted under MIT license by Leibniz Institute for Regional Geography, Leipz
 
 ## Usage php scripts:
 1. First put `.xls` files in `./temp/weikinn/jahreOhneGeo or temp/weikinn/jahre`
-2. Run with `php weikinn_test_ohneGeo.php > log.txt`
+2. Edit `create_import_og.php create_import_og_1571.php` to match proper IDs for tambora db IDs
+3. Run with `php weikinn_test_ohneGeo.php > log.txt` for years after 1571
+4. Run with `php weikinn_test_ohneGeo_1571.php > log_1571.txt` for years before 1571
 
 ## Usage go scripts:
 
